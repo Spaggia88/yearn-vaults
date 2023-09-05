@@ -810,7 +810,14 @@ def permit(owner: address, spender: address, amount: uint256, expiry: uint256, s
 @internal
 def _totalAssets() -> uint256:
     # See note on `totalAssets()`.
-    return self.totalIdle + self.totalDebt
+    accumulated_eta: uint256 = 0
+
+    for strategy in self.withdrawalQueue:
+            if strategy == ZERO_ADDRESS:
+                break
+            accumulated_eta += Strategy(strategy).estimatedTotalAssets()
+
+    return self.totalIdle + accumulated_eta
 
 
 @view
